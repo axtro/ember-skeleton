@@ -5,9 +5,6 @@ require 'rake-pipeline-web-filters'
 
 WebFilters = Rake::Pipeline::Web::Filters
 
-class LoaderFilter < WebFilters::MinispadeFilter
-end
-
 class EmberAssertFilter < Filter
   def generate_output(inputs, output)
     inputs.each do |input|
@@ -23,7 +20,7 @@ output 'assets'
 
 input 'app' do
   match 'lib/**/*.js' do
-    filter LoaderFilter,
+    filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
         input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
       },
@@ -38,7 +35,7 @@ input 'app' do
   end
 
   match 'vendor/**/*.js' do
-    filter LoaderFilter,
+    filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
         input.path.sub(/^vendor\//, '').sub(/\.js$/, '')
       },
@@ -77,7 +74,7 @@ input 'app' do
   match 'templates/**/*.handlebars' do
     filter WebFilters::HandlebarsFilter,
       :key_name_proc => proc { |input| input.path.sub(/^templates\//, '').sub(/\.handlebars$/, '') }
-    filter LoaderFilter,
+    filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
         input.path.sub(/^templates\//, "#{APPNAME}/~templates/").sub(/\.handlebars$/, '').sub(/\.js$/, '')
       },
@@ -90,7 +87,7 @@ input 'app' do
   end
 
   match 'tests/**/*.js' do
-    filter LoaderFilter,
+    filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
         input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
       },
