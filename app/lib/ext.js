@@ -8,9 +8,9 @@ Ember.View.reopen({
         template = get(templates, name);
 
     if (!template) {
-      template = require(name);
+      template = minispade.require('ember-skeleton/~templates/' + name);
       if (!template) {
-        throw new Ember.Error(fmt('%@ - Unable to find %@ "%@".', [this, type, name]));
+        this._super(name, type);
       }
     }
 

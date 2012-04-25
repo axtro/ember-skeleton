@@ -75,10 +75,11 @@ input 'app' do
   end
 
   match 'templates/**/*.handlebars' do
-    filter WebFilters::HandlebarsFilter
+    filter WebFilters::HandlebarsFilter,
+      :key_name_proc => proc { |input| input.path.sub(/^templates\//, '').sub(/\.handlebars$/, '') }
     filter LoaderFilter,
       :module_id_generator => proc { |input|
-        input.path.sub(/^templates\//, "#{APPNAME}/~templates/").sub(/\.handlebars$/, '')
+        input.path.sub(/^templates\//, "#{APPNAME}/~templates/").sub(/\.handlebars$/, '').sub(/\.js$/, '')
       },
       :string => true,
       :rewrite_requires => true
