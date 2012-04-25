@@ -1,64 +1,51 @@
-(function(window) {
-  function requireWrapper(self) {
-    var require = function() {
-      return self.require.apply(self, arguments);
-    };
-    require.exists = function() {
-      return self.exists.apply(self, arguments);
-    };
-    return require;
-  }
+/*jshint evil:true*/
 
-  var Context = function() {
-    return this;
-  };
+if (typeof document !== "undefined") {
+  (function() {
+    minispade = {
+      root: null,
+      modules: {},
+      loaded: {},
 
-  var Loader = function() {
-    this.modules = {};
-    this.loaded = {};
-    this.exports = {};
-    return this;
-  };
-
-  Loader.prototype.require = function(name) {
-    if (!this.loaded[name]) {
-      var module = this.modules[name];
-      if (module) {
-        var require = requireWrapper(this);
-        try {
-          this.exports[name] = module.call(new Context(), require);
-          return this.exports[name];
-        } finally {
-          this.loaded[name] = true;
+      globalEval: function(data) {
+        if ( data ) {
+          // We use execScript on Internet Explorer
+          // We use an anonymous function so that context is window
+          // rather than jQuery in Firefox
+          ( window.execScript || function( data ) {
+            window[ "eval" ].call( window, data );
+          } )( data );
         }
-      } else {
-        throw "The module '" + name + "' has not been registered";
+      },
+
+      require: function(name) {
+        var loaded = minispade.loaded[name];
+        var mod = minispade.modules[name];
+
+        if (!loaded) {
+          if (mod) {
+            minispade.loaded[name] = true;
+
+            if (typeof mod === "string") {
+              this.globalEval(mod);
+            } else {
+              mod();
+            }
+          } else {
+            if (minispade.root && name.substr(0,minispade.root.length) !== minispade.root) {
+              return minispade.require(minispade.root+name);
+            } else {
+              throw "The module '" + name + "' could not be found";
+            }
+          }
+        }
+
+        return loaded;
+      },
+
+      register: function(name, callback) {
+        minispade.modules[name] = callback;
       }
-    }
-    return this.exports[name];
-  };
-
-  Loader.prototype.register = function(name, module) {
-    if (this.exists(name)) {
-      throw "The module '"+ "' has already been registered";
-    }
-    this.modules[name] = module;
-    return true;
-  };
-
-  Loader.prototype.unregister = function(name) {
-    var loaded = !!this.loaded[name];
-    if (loaded) {
-      delete this.exports[name];
-      delete this.modules[name];
-      delete this.loaded[name];
-    }
-    return loaded;
-  };
-
-  Loader.prototype.exists = function(name) {
-    return name in this.modules;
-  };
-
-  window.loader = new Loader();
-})(this);
+    };
+  })();
+}
