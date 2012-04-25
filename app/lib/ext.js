@@ -10,7 +10,7 @@ Ember.View.reopen({
     if (!template) {
       template = minispade.require('ember-skeleton/~templates/' + name);
       if (!template) {
-        this._super(name, type);
+        template = this._super(name, type);
       }
     }
 
