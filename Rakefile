@@ -1,9 +1,7 @@
-APPNAME = 'ember-skeleton'
-
 require 'colored'
 require 'rake-pipeline'
 
-desc "Build #{APPNAME}"
+desc "Build app"
 task :build do
   Rake::Pipeline::Project.new('Assetfile').invoke
 end
@@ -17,7 +15,7 @@ task :test => :build do
   cmd = "phantomjs tests/qunit/run-qunit.js \"file://#{File.dirname(__FILE__)}/tests/index.html\""
 
   # Run the tests
-  puts "Running #{APPNAME} tests"
+  puts "Running tests"
   success = system(cmd)
 
   if success
