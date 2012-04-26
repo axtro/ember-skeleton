@@ -12,7 +12,7 @@ SHOULD_UGLIFY = ENV['RAKEP_MODE'] == 'production'
 output 'assets'
 
 input 'app' do
-  match 'lib/**/*.js' do
+  match '{lib,vendor}/**/*.js' do
     filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
         input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
@@ -22,22 +22,7 @@ input 'app' do
 
     if SHOULD_UGLIFY
       filter EmberStripDebugFilter
-      filter Rake::Pipeline::Web::Filters::UglifyFilter
-    end
-    concat 'app.js'
-  end
-
-  match 'vendor/**/*.js' do
-    filter WebFilters::MinispadeFilter,
-      :module_id_generator => proc { |input|
-        input.path.sub(/\.js$/, '')
-      },
-      :string => !SHOULD_UGLIFY,
-      :rewrite_requires => true
-
-    if SHOULD_UGLIFY
-      filter EmberStripDebugFilter
-      filter Rake::Pipeline::Web::Filters::UglifyFilter
+      uglify
     end
     concat %w[
       vendor/jquery.js
@@ -56,7 +41,7 @@ input 'app' do
       :string => !SHOULD_UGLIFY,
       :rewrite_requires => true
     if SHOULD_UGLIFY
-      filter Rake::Pipeline::Web::Filters::UglifyFilter
+      uglify
     end
     concat 'app.js'
   end
