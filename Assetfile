@@ -5,25 +5,23 @@ require 'rake-pipeline-web-filters'
 require File.join(File.dirname(__FILE__), 'support/ember_strip_debug_filter/ember_strip_debug_filter')
 require File.join(File.dirname(__FILE__), 'support/precompiling_handlebars_filter/precompiling_handlebars_filter')
 
-WebFilters = Rake::Pipeline::Web::Filters
-
 SHOULD_UGLIFY = ENV['RAKEP_MODE'] == 'production'
 
 output 'assets'
 
 input 'app' do
   match '{lib,vendor}/**/*.js' do
-    filter WebFilters::MinispadeFilter,
-      :module_id_generator => proc { |input|
-        input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
-      },
-      :string => !SHOULD_UGLIFY,
-      :rewrite_requires => true
+    minispade :module_id_generator => proc { |input|
+                input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
+              },
+              :string => !SHOULD_UGLIFY,
+              :rewrite_requires => true
 
     if SHOULD_UGLIFY
       filter EmberStripDebugFilter
       uglify
     end
+
     concat %w[
       vendor/jquery.js
       vendor/ember.js
@@ -34,12 +32,13 @@ input 'app' do
     filter PrecompilingHandlebarsFilter,
       :key_name_proc => proc { |input| input.path.sub(/^templates\//, '').sub(/\.handlebars$/, '') },
       :precompile => SHOULD_UGLIFY
-    filter WebFilters::MinispadeFilter,
-      :module_id_generator => proc { |input|
-        input.path.sub(/^templates\//, "#{APPNAME}/~templates/").sub(/\.handlebars$/, '').sub(/\.js$/, '')
-      },
-      :string => !SHOULD_UGLIFY,
-      :rewrite_requires => true
+
+    minispade :module_id_generator => proc { |input|
+                input.path.sub(/^templates\//, "#{APPNAME}/~templates/").sub(/\.handlebars$/, '').sub(/\.js$/, '')
+              },
+              :string => !SHOULD_UGLIFY,
+              :rewrite_requires => true
+      
     if SHOULD_UGLIFY
       uglify
     end
@@ -47,12 +46,12 @@ input 'app' do
   end
 
   match 'tests/**/*.js' do
-    filter WebFilters::MinispadeFilter,
-      :module_id_generator => proc { |input|
-        input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
-      },
-      :string => !SHOULD_UGLIFY,
-      :rewrite_requires => true
+    minispade :module_id_generator => proc { |input|
+                input.path.sub(/^lib\//, "#{APPNAME}/").sub(/\.js$/, '')
+              },
+              :string => !SHOULD_UGLIFY,
+              :rewrite_requires => true
+      
     concat 'app-tests.js'
   end
 
@@ -60,6 +59,7 @@ input 'app' do
     if SHOULD_UGLIFY
       yui_css
     end
+    
     concat ['bootstrap.css', 'main.css'], 'app.css'
   end
 
