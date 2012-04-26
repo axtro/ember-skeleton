@@ -55,23 +55,6 @@ input 'app' do
     ], 'app.js'
   end
 
-  match 'modules/**/*.js' do
-    if SHOULD_UGLIFY
-      filter EmberAssertFilter
-      filter Rake::Pipeline::Web::Filters::UglifyFilter
-    end
-    concat 'app.js'
-  end
-
-  match 'plugins/**/*.js' do
-    if SHOULD_UGLIFY
-      filter Rake::Pipeline::Web::Filters::UglifyFilter
-    end
-    concat do |input|
-      input.sub(/plugins\//, '')
-    end
-  end
-
   match 'templates/**/*.handlebars' do
     filter WebFilters::HandlebarsFilter,
       :key_name_proc => proc { |input| input.path.sub(/^templates\//, '').sub(/\.handlebars$/, '') }
