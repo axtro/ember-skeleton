@@ -114,7 +114,7 @@ input 'app' do
   match 'vendor/**/*.js' do
     filter WebFilters::MinispadeFilter,
       :module_id_generator => proc { |input|
-        input.path.sub(/^vendor\//, '').sub(/\.js$/, '')
+        input.path.sub(/\.js$/, '')
       },
       :string => !SHOULD_UGLIFY,
       :rewrite_requires => true
