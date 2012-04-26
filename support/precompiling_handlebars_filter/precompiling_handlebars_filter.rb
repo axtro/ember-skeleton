@@ -51,7 +51,7 @@ class PrecompilingHandlebarsFilter < Rake::Pipeline::Filter
     # We're using Ember to precompile templates
     unless @context
       headless = File.read("support/precompiling_handlebars_filter/headless-ember.js")
-      ember    = File.read("app/vendor/ember-0.9.7.1.js")
+      ember    = File.read("app/vendor/ember.js")
       @context = ExecJS.compile([headless, ember].join("\n"))
     end
     @context

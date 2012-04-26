@@ -1,5 +1,5 @@
-require('vendor/jquery-1.7.2');
-require('vendor/ember-0.9.7.1');
+require('vendor/jquery');
+require('vendor/ember');
 require('ember-skeleton/ext');
 
 App = Ember.Application.create({
