@@ -28,11 +28,11 @@
         return obj.toString();
       });
 
-      var matcher = /^tests\//, modules = loader.modules;
+      var matcher = /^tests\//, modules = minispade.modules;
       for (var name in modules) {
         if (modules.hasOwnProperty(name)) {
           if (matcher.test(name)) {
-            loader.require(name);
+            minispade.require(name);
           }
         }
       }
