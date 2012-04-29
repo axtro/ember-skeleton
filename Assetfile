@@ -9,6 +9,14 @@ SHOULD_UGLIFY = ENV['RAKEP_MODE'] == 'production'
 
 output 'assets'
 
+class BOMFilter < Rake::Pipeline::Filter
+  def generate_output(inputs, output)
+    inputs.each do |input|
+      output.write("\uFEFF" + input.read)
+    end
+  end
+end
+
 input 'app' do
   match '{lib,vendor}/**/*.js' do
     minispade :module_id_generator => proc { |input|
@@ -75,6 +83,10 @@ input 'app' do
     concat do |input|
       input.sub(/static\//, '')
     end
+  end
+
+  match "app.css,app.js" do
+    filter BOMFilter
   end
 end
 
